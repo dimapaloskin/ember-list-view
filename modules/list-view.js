@@ -315,13 +315,48 @@ function addEmptyView() {
   this.unshiftObject(emptyView);
 }
 
-var domManager = Ember.create(Ember.ContainerView.proto());
+var domManager = {
+  prepend: function(view, html) {
+    view.$().prepend(html);
+    notifyMutationListeners();
+  },
+
+  after: function(view, html) {
+    view.$().after(html);
+    notifyMutationListeners();
+  },
+
+  html: function(view, html) {
+    view.$().html(html);
+    notifyMutationListeners();
+  },
+
+  replace: function(view) {
+    var element = get(view, 'element');
+
+    set(view, 'element', null);
+
+    view._insertElementLater(function() {
+      Ember.$(element).replaceWith(get(view, 'element'));
+      notifyMutationListeners();
+    });
+  },
+
+  remove: function(view) {
+    view.$().remove();
+    notifyMutationListeners();
+  },
+
+  empty: function(view) {
+    view.$().empty();
+    notifyMutationListeners();
+  }
+};
 
 domManager.prepend = function(view, html) {
   view.$('.ember-list-container').prepend(html);
   notifyMutationListeners();
 };
-
 
 
 function enableProfilingOutput() {
